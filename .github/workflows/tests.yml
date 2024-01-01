@@ -1,0 +1,79 @@
+name: Automated Tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Unit Tests (PHP ${{ matrix.php }} / ${{ matrix.database }})
+    strategy:
+      matrix:
+        php: ['8.0', '8.1', '8.2']
+        database: ['pgsql', 'mysql', 'sqlite']
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: vendor
+        key: vendor-${{ hashFiles('composer.json') }}
+    - uses: php-actions/composer@v6
+    - name: Set up PHP
+      uses: shivammathur/setup-php@master
+      with:
+        php-version: ${{ matrix.php }}
+        coverage: pcov
+        extensions: mbstring, pdo-sqlite, pdo-pgsql, pdo-mysql
+    - name: Set up database
+      run: |
+        if [[ "${{ matrix.database }}" == "pgsql" ]]; then
+            sudo systemctl start postgresql ;
+            psql --version ;
+            sudo -u postgres psql -c "SELECT set_config('log_statement', 'all', false);" -U postgres ;
+            sudo -u postgres psql -c "CREATE USER root WITH PASSWORD 'root';" -U postgres ;
+            sudo -u postgres psql -c "CREATE DATABASE test WITH OWNER root;" -U postgres ;
+        fi
+        if [[ "${{ matrix.database }}" == "mysql" ]]; then
+            sudo systemctl start mysql ;
+            mysql --version ;
+            mysql -e "SET GLOBAL general_log = 'ON';" -uroot -proot ;
+            mysql -e "CREATE DATABASE test;" -uroot -proot ;
+        fi
+    - name: Run test suite
+      run: |
+        if [[ "${{ matrix.database }}" == "pgsql" ]]; then
+            export DSN="pgsql:user=root;password=root;host=127.0.0.1;dbname=test"
+        fi
+        if [[ "${{ matrix.database }}" == "mysql" ]]; then
+            export DSN="mysql:user=root;password=root;host=127.0.0.1;dbname=test"
+        fi
+        if [[ "${{ matrix.database }}" == "sqlite" ]]; then
+            export DSN="sqlite::memory:"
+        fi
+        vendor/bin/phpunit tests --coverage-text --whitelist src
+
+  static:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: vendor
+        key: vendor-${{ hashFiles('composer.json') }}
+    - uses: php-actions/composer@v6
+    - uses: php-actions/phpstan@v3
+      with:
+        path: src
+        level: 5
+
+  format:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: vendor
+        key: vendor-${{ hashFiles('composer.json') }}
+    - uses: php-actions/composer@v6
+    - run: ./vendor/bin/php-cs-fixer fix && git diff --exit-code
