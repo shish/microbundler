@@ -9,6 +9,19 @@ use PHPUnit\Framework\Attributes\Depends;
 
 class MicroBundlerTest extends TestCase
 {
+    public function test_empty()
+    {
+        $m = new MicroBundler();
+        [$css, $map] = $m->gen("mini.css");
+        $this->assertEquals(
+            "/*# sourceMappingURL=mini.css.map */",
+            $css
+        );
+        $this->assertEquals(3, $map["version"]);
+        $this->assertEquals([], $map["sources"]);
+        $this->assertEquals("", $map["mappings"]);
+    }
+
     public function test_css_basic()
     {
         $m = new MicroBundler();

@@ -8,7 +8,7 @@ use FFSPHP\Paths;
 class MicroBundler
 {
     /** @var string[] */
-    private array $sources;
+    private array $sources = [];
     private bool $debug = false;
 
     public function __construct()
