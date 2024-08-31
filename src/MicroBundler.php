@@ -17,9 +17,9 @@ class MicroBundler
 
     public function addSource(string $filename, ?string $content = null): void
     {
-        if($content === null) {
+        if ($content === null) {
             $content = file_get_contents($filename);
-            if($content === false) {
+            if ($content === false) {
                 throw new \Exception("file_get_contents failed");
             }
         }
@@ -28,13 +28,13 @@ class MicroBundler
 
     public static function process_file(string $text, string $inpath, string $outpath): string
     {
-        if(str_ends_with($outpath, ".css")) {
+        if (str_ends_with($outpath, ".css")) {
             // given a url relative to the input file, convert it to a url relative to the output file
             $text2 = preg_replace_callback(
                 '/url\(([^)]+)\)/',
                 function ($matches) use ($inpath, $outpath) {
                     $url_relative_to_input = trim($matches[1], "'\"");
-                    if(strpos($url_relative_to_input, "://") !== false || str_starts_with($url_relative_to_input, "data:")) {
+                    if (strpos($url_relative_to_input, "://") !== false || str_starts_with($url_relative_to_input, "data:")) {
                         return "url('$url_relative_to_input')";
                     }
                     $url_relative_to_base = dirname($inpath) . "/" . $url_relative_to_input;
@@ -43,7 +43,7 @@ class MicroBundler
                 },
                 $text
             );
-            if($text2 === null) {
+            if ($text2 === null) {
                 throw new \Exception("preg_replace_callback failed");
             }
             $text = $text2;
@@ -63,10 +63,10 @@ class MicroBundler
         $prev_source_line_count = 0;
         foreach ($this->sources as $source_filename => $source_content) {
             $source_content = static::process_file($source_content, $source_filename, $gen_filename);
-            foreach(explode("\n", $source_content) as $source_line_no => $source_line) {
+            foreach (explode("\n", $source_content) as $source_line_no => $source_line) {
                 $data .= $source_line . "\n";
                 // For the first line in each file
-                if($source_line_no == 0) {
+                if ($source_line_no == 0) {
                     $gen_line_infos[] = [[
                         // we always output new files at column 0
                         0,
@@ -89,10 +89,10 @@ class MicroBundler
             $source_no++;
         }
 
-        if(str_ends_with($gen_filename, ".css")) {
+        if (str_ends_with($gen_filename, ".css")) {
             $data .= "/*# sourceMappingURL=" . basename($gen_filename) . ".map */";
         }
-        if(str_ends_with($gen_filename, ".js")) {
+        if (str_ends_with($gen_filename, ".js")) {
             $data .= "//# sourceMappingURL=" . basename($gen_filename) . ".map";
         }
 
@@ -103,7 +103,7 @@ class MicroBundler
             "names" => [],
             "mappings" => implode(";", array_map(fn ($line_infos) => implode(",", array_map(fn ($line_info) => VLQ::encode_vlq_array($line_info), $line_infos)), $gen_line_infos)),
         ];
-        if($this->debug) {
+        if ($this->debug) {
             $map["sourcesContent"] = array_values($this->sources);
             $map["x_mappings"] = $gen_line_infos;
         }
