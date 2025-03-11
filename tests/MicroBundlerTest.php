@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Depends;
 
 class MicroBundlerTest extends TestCase
 {
-    public function test_empty()
+    public function test_empty(): void
     {
         $m = new MicroBundler();
         [$css, $map] = $m->gen("mini.css");
@@ -22,7 +22,7 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals("", $map["mappings"]);
     }
 
-    public function test_css_basic()
+    public function test_css_basic(): void
     {
         $m = new MicroBundler();
         $m->addSource("foo.css", ".foo { color: red; }");
@@ -41,7 +41,7 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals("AAAA;ACAA;AACA", $map["mappings"]);
     }
 
-    public function test_css_relative_source()
+    public function test_css_relative_source(): void
     {
         $m = new MicroBundler();
         $m->addSource("source/foo.css", ".foo { color: red; }");
@@ -49,7 +49,7 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals(["../source/foo.css"], $map["sources"]);
     }
 
-    public function test_css_process_file()
+    public function test_css_process_file(): void
     {
         // no change
         $this->assertEquals(
@@ -79,7 +79,7 @@ class MicroBundlerTest extends TestCase
     }
 
     #[Depends("test_css_process_file")]
-    public function test_css_relative_url()
+    public function test_css_relative_url(): void
     {
         $m = new MicroBundler();
         $m->addSource("source/foo.css", ".foo { background-image: url(foo.png); }");

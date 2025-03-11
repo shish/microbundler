@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
 
 jobs:
@@ -13,43 +13,43 @@ jobs:
     name: Unit Tests (PHP ${{ matrix.php }})
     strategy:
       matrix:
-        php: ['8.2', '8.3', '8.4']
+        php: ["8.2", "8.3", "8.4"]
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: vendor
-        key: vendor-${{ hashFiles('composer.json') }}
-    - uses: php-actions/composer@v6
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php }}
-        coverage: pcov
-    - name: Run test suite
-      run: vendor/bin/phpunit tests --coverage-text --coverage-filter src
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ hashFiles('composer.json') }}
+      - uses: php-actions/composer@v6
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: pcov
+      - name: Run test suite
+        run: composer test
 
   static:
     name: Static Analysis
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: vendor
-        key: vendor-${{ hashFiles('composer.json') }}
-    - uses: php-actions/composer@v6
-    - run: ./vendor/bin/phpstan analyse src --level 5
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ hashFiles('composer.json') }}
+      - uses: php-actions/composer@v6
+      - run: composer analyse-ci
 
   format:
     name: Formatting
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: vendor
-        key: vendor-${{ hashFiles('composer.json') }}
-    - uses: php-actions/composer@v6
-    - run: ./vendor/bin/php-cs-fixer fix && git diff --exit-code
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ hashFiles('composer.json') }}
+      - uses: php-actions/composer@v6
+      - run: composer format && git diff --exit-code

@@ -5,6 +5,24 @@ namespace MicroBundler;
 use FFSPHP\VLQ;
 use FFSPHP\Paths;
 
+/**
+ * @phpstan-type SourceMap array{
+ *     version: 3,
+ *     file: string,
+ *     sources: list<string>,
+ *     names: array{},
+ *     mappings: string,
+ * }
+ * @phpstan-type SourceMapWithDebug array{
+ *     version: 3,
+ *     file: string,
+ *     sources: list<string>,
+ *     names: array{},
+ *     mappings: string,
+ *     sourcesContent: list<string>,
+ *     x_mappings: list<array{array{0, int<0, max>, int<min, 1>, 0}}>
+ * }
+ */
 class MicroBundler
 {
     /** @var string[] */
@@ -53,7 +71,7 @@ class MicroBundler
     }
 
     /**
-     * @return mixed[] [string $data, array $map]
+     * @return array{0: string, 1: SourceMap|SourceMapWithDebug}
      */
     public function gen(string $gen_filename): array
     {
