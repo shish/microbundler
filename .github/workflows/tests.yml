@@ -16,19 +16,18 @@ jobs:
         php: ["8.2", "8.3", "8.4"]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: vendor
-          key: vendor-${{ hashFiles('composer.json') }}
-      - uses: php-actions/composer@v6
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: pcov
-      - name: Run test suite
-        run: composer test
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ hashFiles('composer.json') }}
+      - run: composer install
+      - run: composer test
 
   static:
     name: Static Analysis
@@ -39,7 +38,7 @@ jobs:
         with:
           path: vendor
           key: vendor-${{ hashFiles('composer.json') }}
-      - uses: php-actions/composer@v6
+      - run: composer install
       - run: composer analyse-ci
 
   format:
@@ -51,5 +50,5 @@ jobs:
         with:
           path: vendor
           key: vendor-${{ hashFiles('composer.json') }}
-      - uses: php-actions/composer@v6
+      - run: composer install
       - run: composer format && git diff --exit-code
