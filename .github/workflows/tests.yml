@@ -13,11 +13,10 @@ jobs:
     name: Unit Tests (PHP ${{ matrix.php }})
     strategy:
       matrix:
-        php: ["8.2", "8.3", "8.4"]
+        php: ["8.2", "8.3", "8.4", "8.5"]
     runs-on: ubuntu-24.04
     steps:
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: pcov
