@@ -49,19 +49,19 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals(["../source/foo.css"], $map["sources"]);
     }
 
-    public function test_css_process_file(): void
+    public function test_css_processFile(): void
     {
         // no change
         $this->assertEquals(
             "foo\n\n\nbar",
-            MicroBundler::process_file("foo\n\n\nbar", "in.css", "out.css")
+            MicroBundler::processFile("foo\n\n\nbar", "in.css", "out.css")
         );
 
         // remove block comment - dangerous??
         /*
         $this->assertEquals(
             "foo\n\n\nbar",
-            MicroBundler::process_file("foo\n\/* this is a comment\n* over multiple lines *\/\nbar", "in.css", "out.css")
+            MicroBundler::processFile("foo\n\/* this is a comment\n* over multiple lines *\/\nbar", "in.css", "out.css")
         );
         */
 
@@ -69,16 +69,16 @@ class MicroBundlerTest extends TestCase
         // same dir
         $this->assertEquals(
             "url(foo.png)",
-            MicroBundler::process_file("url(foo.png)", "in.css", "out.css")
+            MicroBundler::processFile("url(foo.png)", "in.css", "out.css")
         );
         // sibling dir
         $this->assertEquals(
             "url(../source/foo.png)",
-            MicroBundler::process_file("url(foo.png)", "source/in.css", "gen/out.css")
+            MicroBundler::processFile("url(foo.png)", "source/in.css", "gen/out.css")
         );
     }
 
-    #[Depends("test_css_process_file")]
+    #[Depends("test_css_processFile")]
     public function test_css_relative_url(): void
     {
         $m = new MicroBundler();

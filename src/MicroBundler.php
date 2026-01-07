@@ -44,7 +44,7 @@ class MicroBundler
         $this->sources[$filename] = $content;
     }
 
-    public static function process_file(string $text, string $inpath, string $outpath): string
+    public static function processFile(string $text, string $inpath, string $outpath): string
     {
         if (str_ends_with($outpath, ".css")) {
             // given a url relative to the input file, convert it to a url relative to the output file
@@ -80,7 +80,7 @@ class MicroBundler
         $source_no = 0;
         $prev_source_line_count = 0;
         foreach ($this->sources as $source_filename => $source_content) {
-            $source_content = static::process_file($source_content, $source_filename, $gen_filename);
+            $source_content = static::processFile($source_content, $source_filename, $gen_filename);
             foreach (explode("\n", $source_content) as $source_line_no => $source_line) {
                 $data .= $source_line . "\n";
                 // For the first line in each file
