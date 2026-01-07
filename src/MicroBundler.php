@@ -51,13 +51,23 @@ class MicroBundler
             $text2 = preg_replace_callback(
                 '/url\(([^)]+)\)/',
                 function ($matches) use ($inpath, $outpath) {
-                    $url_relative_to_input = trim($matches[1], "'\"");
-                    if (strpos($url_relative_to_input, "://") !== false || str_starts_with($url_relative_to_input, "data:")) {
-                        return "url('$url_relative_to_input')";
+                    $quote = match($matches[1][0]) {
+                        "'" => "'",
+                        '"' => '"',
+                        default => "",
+                    };
+                    $in_url = trim($matches[1], $quote);
+                    if (
+                        !str_contains($in_url, "://") &&
+                        !str_starts_with($in_url, "/") &&
+                        !str_starts_with($in_url, "data:")
+                    ) {
+                        $url_relative_to_base = dirname($inpath) . "/" . $in_url;
+                        $out_url = Paths::relative_path($url_relative_to_base, $outpath);
+                    } else {
+                        $out_url = $in_url;
                     }
-                    $url_relative_to_base = dirname($inpath) . "/" . $url_relative_to_input;
-                    $url_relative_to_output = Paths::relative_path($url_relative_to_base, $outpath);
-                    return "url($url_relative_to_output)";
+                    return "url($quote$out_url$quote)";
                 },
                 $text
             );

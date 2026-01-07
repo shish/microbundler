@@ -87,6 +87,40 @@ class CSSTest extends TestCase
         );
     }
 
+    public function test_urlReplaceAbsolute(): void
+    {
+        // absolute URL should not change
+        $this->assertEquals(
+            "url(/images/foo.png)",
+            MicroBundler::processFile("url(/images/foo.png)", "in.css", "out.css")
+        );
+        $this->assertEquals(
+            "url(https://example.com/images/foo.png)",
+            MicroBundler::processFile("url(https://example.com/images/foo.png)", "in.css", "out.css")
+        );
+        // data URL should not change
+        $this->assertEquals(
+            "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA)",
+            MicroBundler::processFile("url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA)", "in.css", "out.css")
+        );
+    }
+
+    public function test_urlReplaceQuotes(): void
+    {
+        $this->assertEquals(
+            "url(foo.png)",
+            MicroBundler::processFile("url(foo.png)", "in.css", "out.css")
+        );
+        $this->assertEquals(
+            "url('foo.png')",
+            MicroBundler::processFile("url('foo.png')", "in.css", "out.css")
+        );
+        $this->assertEquals(
+            'url("foo.png")',
+            MicroBundler::processFile('url("foo.png")', "in.css", "out.css")
+        );
+    }
+
     public function test_relativeUrl(): void
     {
         $m = new MicroBundler();
