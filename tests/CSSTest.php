@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MicroBundler;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\Depends;
 
-class MicroBundlerTest extends TestCase
+class CSSTest extends TestCase
 {
     public function test_empty(): void
     {
@@ -22,7 +21,7 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals("", $map["mappings"]);
     }
 
-    public function test_css_basic(): void
+    public function test_basic(): void
     {
         $m = new MicroBundler();
         $m->addSource("foo.css", ".foo { color: red; }");
@@ -41,7 +40,7 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals("AAAA;ACAA;AACA", $map["mappings"]);
     }
 
-    public function test_css_relative_source(): void
+    public function test_relativeSource(): void
     {
         $m = new MicroBundler();
         $m->addSource("source/foo.css", ".foo { color: red; }");
@@ -49,23 +48,33 @@ class MicroBundlerTest extends TestCase
         $this->assertEquals(["../source/foo.css"], $map["sources"]);
     }
 
-    public function test_css_processFile(): void
+    /**
+     * no change by default
+     */
+    public function test_processFile(): void
     {
-        // no change
         $this->assertEquals(
             "foo\n\n\nbar",
             MicroBundler::processFile("foo\n\n\nbar", "in.css", "out.css")
         );
+    }
 
+    /*
+    public function test_blockComment(): void
+    {
         // remove block comment - dangerous??
-        /*
         $this->assertEquals(
             "foo\n\n\nbar",
             MicroBundler::processFile("foo\n\/* this is a comment\n* over multiple lines *\/\nbar", "in.css", "out.css")
         );
-        */
+    }
+    */
 
-        // change URLs from "relative to source file" to "relative to output file"
+    /**
+     * change URLs from "relative to source file" to "relative to output file"
+     */
+    public function test_urlReplace(): void
+    {
         // same dir
         $this->assertEquals(
             "url(foo.png)",
@@ -78,8 +87,7 @@ class MicroBundlerTest extends TestCase
         );
     }
 
-    #[Depends("test_css_processFile")]
-    public function test_css_relative_url(): void
+    public function test_relativeUrl(): void
     {
         $m = new MicroBundler();
         $m->addSource("source/foo.css", ".foo { background-image: url(foo.png); }");
