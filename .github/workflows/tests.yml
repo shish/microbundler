@@ -20,7 +20,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: pcov
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/cache@v6
         with:
           path: vendor
@@ -35,7 +35,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/cache@v6
         with:
           path: vendor
@@ -50,7 +50,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/cache@v6
         with:
           path: vendor
